@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 class LoginStateProvider extends ChangeNotifier {
   final UserModel _user = UserModel();
 
-  static const String tempUsername = 'tyrone';
+  static const String tempUsername = 'user';
   static const String tempPassword = 'password';
 
   UserModel get user => _user;
