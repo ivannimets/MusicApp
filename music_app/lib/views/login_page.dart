@@ -27,12 +27,19 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginStateProvider>(context);
     return Scaffold(
-      appBar: AppBar(title: Text("Login")),
       body: Container(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 40),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(
+                Icons.music_note,
+                size: 100,
+              ),
+              Text("Music App", style: TextStyle(fontSize: 40))
+            ]),
             Text("Enter User Name:"),
             TextField(
               controller: usernameController,
@@ -79,9 +86,9 @@ class LoginPageState extends State<LoginPage> {
                 }
                 return loginState.user.errorMessage.isNotEmpty
                     ? Text(
-                      loginState.user.errorMessage,
-                      style: TextStyle(color: Colors.red),
-                    )
+                        loginState.user.errorMessage,
+                        style: TextStyle(color: Colors.red),
+                      )
                     : Container();
               },
             ),
