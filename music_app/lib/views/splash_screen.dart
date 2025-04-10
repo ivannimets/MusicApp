@@ -47,9 +47,8 @@ class SplashScreenState extends State<SplashScreen>
               child: child,
             );
           },
-          child: Image.asset('assets/images/tools.png', width: 150),
+          child: Icon(Icons.note)),
         ),
-      ),
-    );
+      );
   }
 }

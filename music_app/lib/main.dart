@@ -17,9 +17,9 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => LoginStateProvider(),
       child: MaterialApp(
-        title: "Task Pro",
+        title: "Music App",
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
+        theme: AppTheme.darkTheme,
         initialRoute: '/',
         routes: {
           '/': (context) => SplashScreen(),
