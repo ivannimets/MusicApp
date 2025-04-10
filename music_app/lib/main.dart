@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/providers/loginstate_provider.dart';
 import 'package:music_app/views/login_page.dart';
+import 'package:music_app/views/playlists_screen.dart';
 import 'package:music_app/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -24,6 +27,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => SplashScreen(),
           '/loginPage': (context) => LoginPage(),
+          '/playlistsPage': (context) => PlaylistsScreen(),
         },
       ),
     );
