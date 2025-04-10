@@ -9,7 +9,8 @@ class DBHelper {
 
   DBHelper._init();
 
-  Future<Database> get musicAppDatabase async { // Enforce singleton instance
+  Future<Database> get musicAppDatabase async {
+    // Enforce singleton instance
     if (_database != null) return _database!;
 
     _database = await _getDB();
@@ -36,16 +37,16 @@ class DBHelper {
       )
     ''');
 
-    await db.execute('INSERT INTO genres(name) VALUES ("Country")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Pop")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Rock")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Hip-Hop")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Jazz")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Classical")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Latin")');
-    await db.execute('INSERT INTO genres(name) VALUES ("EDM")');
-    await db.execute('INSERT INTO genres(name) VALUES ("R&B")');
-    await db.execute('INSERT INTO genres(name) VALUES ("Reggae")');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Country')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Pop')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Rock')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Hip-Hop')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Jazz')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Classical')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Latin')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('EDM')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('R&B')''');
+    await db.execute('''INSERT INTO genres(name) VALUES ('Reggae')''');
 
     await db.execute('''
       CREATE TABLE playlists (
@@ -56,6 +57,14 @@ class DBHelper {
         imageLink TEXT,
         genreId INTEGER,
         FOREIGN KEY(genreId) REFERENCES genres(genreId)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE playlist_songs (
+        playlistId INTEGER,
+        songLink TEXT,
+        FOREIGN KEY(playlistId) REFERENCES playlists(playlistId)
       )
     ''');
 
@@ -85,12 +94,19 @@ class DBHelper {
           playlists.add(playlist);
         }
 
-        return DBPlaylistResult(isSuccess: true, message: "Playlists Retrieved", playlistList: playlists);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlists Retrieved",
+            playlistList: playlists);
       } else {
-        return DBPlaylistResult(isSuccess: false, message: "No Playlists Found", playlistList: playlists);
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "No Playlists Found",
+            playlistList: playlists);
       }
     } catch (e) {
-      return DBPlaylistResult(isSuccess: false, message: "Error: $e", playlistList: []);
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 
@@ -110,12 +126,63 @@ class DBHelper {
         DBGenreResult genreResult = await getGenre(playlist.genreId);
         if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
         playlists.add(playlist);
-        return DBPlaylistResult(isSuccess: true, message: "Playlist Retrieved", playlistList: playlists);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlist Retrieved",
+            playlistList: playlists);
       } else {
-        return DBPlaylistResult(isSuccess: false, message: "No Matching Playlist Found", playlistList: playlists);
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "No Matching Playlist Found",
+            playlistList: playlists);
       }
     } catch (e) {
-      return DBPlaylistResult(isSuccess: false, message: "Error: $e", playlistList: []);
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
+    }
+  }
+
+  Future<DBPlaylistResult> getPlaylistWithSongs(int id) async {
+    List<Playlist> playlists = [];
+    List<Song> songs = [];
+    final db = await dbMusicApp.musicAppDatabase;
+
+    try {
+      List<Map<String, dynamic>> result = await db.query(
+        'playlists',
+        where: 'playlistId = ?',
+        whereArgs: [id],
+      );
+      List<Map<String, dynamic>> songResults = await db.query(
+        'playlist_songs',
+        columns: ['songLink'],
+        where: 'playlistId = ?',
+        whereArgs: [id],
+      );
+
+      for (Map<String, dynamic> row in songResults) {
+        songs.add(Song.fromMap(row));
+      }
+
+      if (result.isNotEmpty) {
+        Playlist playlist = Playlist.fromMap(result[0]);
+        DBGenreResult genreResult = await getGenre(playlist.genreId);
+        if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
+        playlist.songs = songs;
+        playlists.add(playlist);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlist Retrieved",
+            playlistList: playlists);
+      } else {
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "No Matching Playlist Found",
+            playlistList: playlists);
+      }
+    } catch (e) {
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 
@@ -123,18 +190,22 @@ class DBHelper {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
-      int playlistId = await db.insert(
-          'playlists',
-          playlistDetails.toMap()
-      );
+      int playlistId = await db.insert('playlists', playlistDetails.toMap());
 
       if (playlistId > 0) {
-        return DBPlaylistResult(isSuccess: true, message: "Playlist Inserted Successfully with ID: $playlistId", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlist Inserted Successfully with ID: $playlistId",
+            playlistList: []);
       } else {
-        return DBPlaylistResult(isSuccess: false, message: "Failed to Insert Playlist", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "Failed to Insert Playlist",
+            playlistList: []);
       }
     } catch (e) {
-      return DBPlaylistResult(isSuccess: false, message: "Error: $e", playlistList: []);
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 
@@ -152,12 +223,19 @@ class DBHelper {
       );
 
       if (rowsAffected > 0) {
-        return DBPlaylistResult(isSuccess: true, message: "Playlist Updated Successfully", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlist Updated Successfully",
+            playlistList: []);
       } else {
-        return DBPlaylistResult(isSuccess: false, message: "No Matching Playlist Found", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "No Matching Playlist Found",
+            playlistList: []);
       }
     } catch (e) {
-      return DBPlaylistResult(isSuccess: false, message: "Error: $e", playlistList: []);
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 
@@ -172,12 +250,19 @@ class DBHelper {
       );
 
       if (rowsDeleted > 0) {
-        return DBPlaylistResult(isSuccess: true, message: "Playlist Deleted Successfully", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Playlist Deleted Successfully",
+            playlistList: []);
       } else {
-        return DBPlaylistResult(isSuccess: false, message: "No Matching Playlist Found", playlistList: []);
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "No Matching Playlist Found",
+            playlistList: []);
       }
     } catch (e) {
-      return DBPlaylistResult(isSuccess: false, message: "Error: $e", playlistList: []);
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 
@@ -193,12 +278,15 @@ class DBHelper {
           genres.add(Genre.fromMap(genre));
         }
 
-        return DBGenreResult(isSuccess: true, message: "Genres Retrieved", genreList: genres);
+        return DBGenreResult(
+            isSuccess: true, message: "Genres Retrieved", genreList: genres);
       } else {
-        return DBGenreResult(isSuccess: false, message: "No Genres Found", genreList: genres);
+        return DBGenreResult(
+            isSuccess: false, message: "No Genres Found", genreList: genres);
       }
     } catch (e) {
-      return DBGenreResult(isSuccess: false, message: "Error: $e", genreList: []);
+      return DBGenreResult(
+          isSuccess: false, message: "Error: $e", genreList: []);
     }
   }
 
@@ -207,8 +295,8 @@ class DBHelper {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
-      List<Map<String, dynamic>> result = await db.query(
-          'genres', where: 'genreId = ?', whereArgs: [id]);
+      List<Map<String, dynamic>> result =
+          await db.query('genres', where: 'genreId = ?', whereArgs: [id]);
 
       if (result.isNotEmpty) {
         genres.add(Genre.fromMap(result[0]));
@@ -222,6 +310,40 @@ class DBHelper {
     } catch (e) {
       return DBGenreResult(
           isSuccess: false, message: "Error: $e", genreList: []);
+    }
+  }
+
+  Future<DBPlaylistResult> addSongToPlaylist(Song song, int id) async {
+    final db = await dbMusicApp.musicAppDatabase;
+
+    try {
+      await db.insert(
+        'playlist_songs',
+        {'playlistId': id, 'songLink': song.songLink} as Map<String, dynamic>,
+      );
+
+      List<Map<String, dynamic>> songResult = await db.query(
+        'playlist_songs',
+        columns: ['playlistId'],
+        where: 'playlistId = ? AND songLink = ?',
+        whereArgs: [id, song.songLink],
+      );
+      int playlistId = songResult[0]['playlistId'];
+
+      if (playlistId > 0) {
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Successfully added Song to Playlist with ID: $playlistId",
+            playlistList: []);
+      } else {
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "Failed to Add Song to Playlist",
+            playlistList: []);
+      }
+    } catch (e) {
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
     }
   }
 }

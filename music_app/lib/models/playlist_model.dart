@@ -4,10 +4,11 @@ class Playlist {
   late String name;
   late String description;
   late String imageLink;
+  late List<Song>? songs;
   late int genreId;
   late Genre? genre;
 
-  Playlist({this.playlistId, required this.isPublic, required this.name, required this.description, required this.imageLink, required this.genreId, this.genre});
+  Playlist({this.playlistId, required this.isPublic, required this.name, required this.description, required this.imageLink, this.songs, required this.genreId, this.genre});
 
   Playlist.fromMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
@@ -50,6 +51,26 @@ class Genre {
     Map<String, dynamic> map = {
       'genreId': genreId,
       'name': name
+    };
+    return map;
+  }
+}
+
+class Song {
+  late String songLink;
+
+  Song({required this.songLink});
+
+  Song.fromMap(Map<String, dynamic> map) {
+    if (map.isEmpty) {
+      throw Exception("You must provide a map with data");
+    }
+    songLink = map['songLink'];
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {
+      'songLink': songLink
     };
     return map;
   }
