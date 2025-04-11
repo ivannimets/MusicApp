@@ -141,26 +141,6 @@ class LoginPageState extends State<LoginPage> {
                       : Container();
                 },
               ),
-            ),
-            SizedBox(height: 20),
-            Consumer<LoginStateProvider>(
-              builder: (context, loginState, child) {
-                if (loginState.user.errorMessage.isEmpty &&
-                    loginState.user.isLoggedIn) {
-                  Future.microtask(() {
-                    Navigator.pushNamed(context, '/homePage');
-                  });
-                  return Container();
-                }
-                return loginState.user.errorMessage.isNotEmpty
-                    ? Text(
-                      loginState.user.errorMessage,
-                      style: TextStyle(color: Colors.red),
-                    )
-                    : Container();
-              },
-            ),
-          ],
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:music_app/database/db_helper.dart';
 import 'package:music_app/models/db_result.dart';
 import 'package:music_app/models/playlist_arguments_model.dart';
 import 'package:music_app/models/playlist_model.dart';
+import 'package:music_app/widgets/bottom_nav.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   const PlaylistsScreen({super.key});
@@ -84,6 +85,10 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Music App"),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+          context: context,
+          currentIndex: 2,
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
