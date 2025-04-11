@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:music_app/core/app_colors.dart';
+import 'package:music_app/models/song_model.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:provider/provider.dart';
 import '../providers/loginstate_provider.dart';
@@ -13,9 +16,11 @@ class PlayingPage extends StatefulWidget {
   PlayingPageState createState() => PlayingPageState();
 }
 
-class PlayingPageState extends State<PlayingPage> with SingleTickerProviderStateMixin {
+class PlayingPageState extends State<PlayingPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
-  String albumImageUrl = '';
+
+  String albumCoverURL = '';
   bool isPlaying = false;
 
   int songLength = (60 * 3) + 24;
@@ -30,15 +35,38 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
         _updateTime(1);
       }
     });
-
-    fetchAlbumImage();
   }
 
-  Future<void> fetchAlbumImage() async {
-    setState(() {
-      albumImageUrl =
-      'http://coverartarchive.org/release/76df3287-6cda-33eb-8e9a-044b5e15ffdd/front';
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchAlbumCover();
+  }
+
+  Future<void> _fetchAlbumCover() async {
+    final loginState = Provider.of<LoginStateProvider>(context, listen: false);
+    final song = loginState.user.currentSong;
+
+    if (song == null) {
+      return;
+    }
+
+    final response = await http.get(
+        Uri.parse('https://coverartarchive.org/release/${song.albumUUID}'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['images'] != null && data['images'].isNotEmpty) {
+        final imageUrl = data['images'][0]['image'];
+
+        if (imageUrl != null && mounted) {
+          setState(() {
+            albumCoverURL = imageUrl;
+          });
+        }
+      }
+    }
   }
 
   void _togglePlayPause() {
@@ -67,6 +95,8 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
     final loginState = Provider.of<LoginStateProvider>(context);
     int selectedIndex = 0;
 
+    SongModel? song = loginState.user.currentSong;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -74,17 +104,24 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 80),
-              albumImageUrl.isNotEmpty
-                  ? Container(
+              Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
-                child: Image.network(
-                  albumImageUrl,
-                  height: 350,
-                  fit: BoxFit.cover,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: (albumCoverURL.isNotEmpty)
+                      ? Image.network(
+                          albumCoverURL,
+                          height: 350,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/images/placeholder.jpg',
+                          height: 350,
+                          fit: BoxFit.cover,
+                        ),
                 ),
-              )
-                  : CircularProgressIndicator(),
+              ),
               SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -95,7 +132,7 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Song Title',
+                          song?.name ?? "Nothing playing",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 36,
@@ -103,7 +140,7 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
                           ),
                         ),
                         Text(
-                          'Artist Name',
+                          song?.artist ?? "",
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 28,
@@ -174,7 +211,7 @@ class PlayingPageState extends State<PlayingPage> with SingleTickerProviderState
                       isPlaying
                           ? Icons.pause_circle_filled
                           : Icons.play_circle_filled,
-                      color: Colors.green,
+                      color: AppColors.primary,
                       size: 90,
                     ),
                     onPressed: _togglePlayPause,
