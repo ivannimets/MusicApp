@@ -100,17 +100,17 @@ class LoginPageState extends State<LoginPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 100.0),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 20.0, horizontal: 100.0),
                     textStyle: TextStyle(fontSize: 18),
                   ),
                   child: Text("Login"),
                 ),
               ),
               SizedBox(height: 20),
-              Center(child: GestureDetector(
-                onTap: () {
-                  // Do nothing
-                },
+              Center(
+                  child: GestureDetector(
+                onTap: () {},
                 child: Text(
                   "Forgot Password?",
                   style: TextStyle(
@@ -132,11 +132,12 @@ class LoginPageState extends State<LoginPage> {
                   }
                   return loginState.user.errorMessage.isNotEmpty
                       ? Center(
-                    child: Text(
-                      loginState.user.errorMessage,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 20),
-                    ),
-                  )
+                          child: Text(
+                            loginState.user.errorMessage,
+                            style: TextStyle(
+                                color: Colors.redAccent, fontSize: 20),
+                          ),
+                        )
                       : Container();
                 },
               ),

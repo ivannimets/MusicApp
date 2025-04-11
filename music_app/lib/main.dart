@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music_app/providers/loginstate_provider.dart';
 import 'package:music_app/views/login_page.dart';
 import 'package:music_app/views/playing_page.dart';
+import 'package:music_app/views/search_page.dart';
 import 'package:music_app/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => SplashScreen(),
           '/loginPage': (context) => LoginPage(),
-          '/playingPage': (context) => PlayingPage()
+          '/playingPage': (context) => PlayingPage(),
+          '/searchPage': (context) => SearchPage(),
         },
       ),
     );
