@@ -1,0 +1,2 @@
+C:/Users/marti/StudioProjects/MusicApp/music_app/android/app/.cxx/Debug/736l5t4m/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/marti/StudioProjects/MusicApp/music_app/android/app/.cxx/Debug/736l5t4m/armeabi-v7a/CMakeFiles/rebuild_cache.dir

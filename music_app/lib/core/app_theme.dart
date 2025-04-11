@@ -14,6 +14,16 @@ class AppTheme {
         scaffoldBackgroundColor: AppColors.background,
         appBarTheme: AppBarTheme(
           backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.background,
+          textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          minimumSize: Size(150, 40),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: TextStyle(color: AppColors.textPrimary),
+        border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.primary),
           titleTextStyle: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -58,6 +68,14 @@ class AppTheme {
           labelMedium: TextStyle(fontFamily: 'Afacad', color: AppColors.textPrimary, fontSize: 12),
           labelSmall: TextStyle(fontFamily: 'Afacad', color: AppColors.textPrimary, fontSize: 11),
         ),
+      ),
+      listTileTheme: ListTileThemeData(
+        tileColor: AppColors.backgroundSecondary,
+        textColor: AppColors.textPrimary,
+        iconColor: AppColors.textPrimary,
+        contentPadding: EdgeInsets.only(right: 0, left: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 }
