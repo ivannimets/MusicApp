@@ -45,11 +45,11 @@ class SplashScreenState extends State<SplashScreen>
           animation: controller,
           builder: (context, child) {
             return Transform.rotate(
-              angle: controller.value * 2 * pi,
+              angle: controller.value * 10 * pi,
               child: child,
             );
           },
-          child: Icon(Icons.note)),
+          child: Icon(Icons.music_note, color: AppColors.textPrimary, size: 50,)),
         ),
       );
   }
