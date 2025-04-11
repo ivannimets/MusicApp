@@ -1,10 +1,10 @@
 class Playlist {
-  late int? playlistId;
+  int? playlistId;
   late bool isPublic;
   late String name;
   late String description;
   late String imageLink;
-  late List<Song>? songs;
+  List<Song>? songs;
   late int genreId;
   late Genre? genre;
 

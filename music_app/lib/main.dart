@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/providers/loginstate_provider.dart';
+import 'package:music_app/views/add_playlist_screen.dart';
+import 'package:music_app/views/edit_playlist_screen.dart';
 import 'package:music_app/views/login_page.dart';
 import 'package:music_app/views/playlists_screen.dart';
 import 'package:music_app/views/splash_screen.dart';
@@ -28,6 +30,8 @@ class MyApp extends StatelessWidget {
           '/': (context) => SplashScreen(),
           '/loginPage': (context) => LoginPage(),
           '/playlistsPage': (context) => PlaylistsScreen(),
+          '/addPlaylist': (context) => AddPlaylistScreen(),
+          '/editPlaylist': (context) => EditPlaylistScreen(),
         },
       ),
     );

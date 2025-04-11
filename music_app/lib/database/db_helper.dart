@@ -80,8 +80,8 @@ class DBHelper {
   }
 
   Future<DBPlaylistResult> getAllPlaylists() async {
-    List<Playlist> playlists = [];
     final db = await dbMusicApp.musicAppDatabase;
+    List<Playlist> playlists = [];
 
     try {
       List<Map<String, dynamic>> result = await db.query('playlists');
@@ -91,6 +91,8 @@ class DBHelper {
           Playlist playlist = Playlist.fromMap(row);
           DBGenreResult genreResult = await getGenre(playlist.genreId);
           if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
+          DBSongListResult songsResult = await getSongsOfPlaylist(playlist.playlistId!);
+          playlist.songs = songsResult.isSuccess ? songsResult.songList : [];
           playlists.add(playlist);
         }
 
@@ -111,8 +113,8 @@ class DBHelper {
   }
 
   Future<DBPlaylistResult> getPlaylist(int id) async {
-    List<Playlist> playlists = [];
     final db = await dbMusicApp.musicAppDatabase;
+    List<Playlist> playlists = [];
 
     try {
       List<Map<String, dynamic>> result = await db.query(
@@ -120,55 +122,13 @@ class DBHelper {
         where: 'playlistId = ?',
         whereArgs: [id],
       );
+      DBSongListResult songResult = await getSongsOfPlaylist(id);
 
       if (result.isNotEmpty) {
         Playlist playlist = Playlist.fromMap(result[0]);
         DBGenreResult genreResult = await getGenre(playlist.genreId);
         if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
-        playlists.add(playlist);
-        return DBPlaylistResult(
-            isSuccess: true,
-            message: "Playlist Retrieved",
-            playlistList: playlists);
-      } else {
-        return DBPlaylistResult(
-            isSuccess: false,
-            message: "No Matching Playlist Found",
-            playlistList: playlists);
-      }
-    } catch (e) {
-      return DBPlaylistResult(
-          isSuccess: false, message: "Error: $e", playlistList: []);
-    }
-  }
-
-  Future<DBPlaylistResult> getPlaylistWithSongs(int id) async {
-    List<Playlist> playlists = [];
-    List<Song> songs = [];
-    final db = await dbMusicApp.musicAppDatabase;
-
-    try {
-      List<Map<String, dynamic>> result = await db.query(
-        'playlists',
-        where: 'playlistId = ?',
-        whereArgs: [id],
-      );
-      List<Map<String, dynamic>> songResults = await db.query(
-        'playlist_songs',
-        columns: ['songLink'],
-        where: 'playlistId = ?',
-        whereArgs: [id],
-      );
-
-      for (Map<String, dynamic> row in songResults) {
-        songs.add(Song.fromMap(row));
-      }
-
-      if (result.isNotEmpty) {
-        Playlist playlist = Playlist.fromMap(result[0]);
-        DBGenreResult genreResult = await getGenre(playlist.genreId);
-        if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
-        playlist.songs = songs;
+        if (songResult.isSuccess) playlist.songs = songResult.songList;
         playlists.add(playlist);
         return DBPlaylistResult(
             isSuccess: true,
@@ -267,11 +227,11 @@ class DBHelper {
   }
 
   Future<DBGenreResult> getAllGenres() async {
-    List<Genre> genres = [];
     final db = await dbMusicApp.musicAppDatabase;
+    List<Genre> genres = [];
 
     try {
-      List<Map<String, dynamic>> result = await db.query('genres');
+      List<Map<String, dynamic>> result = await db.query('genres', orderBy: 'name');
 
       if (result.isNotEmpty) {
         for (Map<String, dynamic> genre in result) {
@@ -291,8 +251,8 @@ class DBHelper {
   }
 
   Future<DBGenreResult> getGenre(int id) async {
-    List<Genre> genres = [];
     final db = await dbMusicApp.musicAppDatabase;
+    List<Genre> genres = [];
 
     try {
       List<Map<String, dynamic>> result =
@@ -310,6 +270,32 @@ class DBHelper {
     } catch (e) {
       return DBGenreResult(
           isSuccess: false, message: "Error: $e", genreList: []);
+    }
+  }
+
+  Future<DBSongListResult> getSongsOfPlaylist(int id) async {
+    final db = await dbMusicApp.musicAppDatabase;
+    List<Song> songs = [];
+
+    try {
+      List<Map<String, dynamic>> results = await db.query(
+        'playlist_songs',
+        columns: ['songLink'],
+        where: 'playlistId = ?',
+        whereArgs: [id],
+      );
+
+      for (Map<String, dynamic> row in results) {
+        songs.add(Song.fromMap(row));
+      }
+
+      if (songs.isNotEmpty) {
+        return DBSongListResult(isSuccess: true, message: "Songs retrieved", songList: songs);
+      } else {
+        return DBSongListResult(isSuccess: false, message: "No songs are associated with that playlist_arguments_model.dart", songList: []);
+      }
+    } catch (e) {
+      return DBSongListResult(isSuccess: false, message: "Error: $e", songList: []);
     }
   }
 

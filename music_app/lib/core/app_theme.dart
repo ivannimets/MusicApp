@@ -25,11 +25,13 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.background,
           textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          minimumSize: Size(150, 40),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        labelStyle: TextStyle(color: AppColors.textPrimary),
         border: OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: AppColors.primary),
@@ -37,6 +39,13 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: AppColors.secondary, width: 2.0),
         ),
+      ),
+      listTileTheme: ListTileThemeData(
+        tileColor: AppColors.backgroundSecondary,
+        textColor: AppColors.textPrimary,
+        iconColor: AppColors.textPrimary,
+        contentPadding: EdgeInsets.only(right: 0, left: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

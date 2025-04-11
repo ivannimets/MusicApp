@@ -73,7 +73,7 @@ class LoginPageState extends State<LoginPage> {
                 if (loginState.user.errorMessage.isEmpty &&
                     loginState.user.isLoggedIn) {
                   Future.microtask(() {
-                    Navigator.pushNamed(context, '/homePage');
+                    Navigator.pushNamed(context, '/playlistsPage');
                   });
                   return Container();
                 }
