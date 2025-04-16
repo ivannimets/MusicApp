@@ -124,7 +124,7 @@ class SearchPageState extends State<SearchPage> {
                     _searchResults[index].containsKey('name');
                     return SongCard(
                       song: CachedSong(
-                          uuid: '',
+                          uuid: _searchResults[index]['id'] ?? "",
                           albumUUID:
                           _getReleaseId(_searchResults[index]),
                           name: _searchResults[index]['title'] ??
