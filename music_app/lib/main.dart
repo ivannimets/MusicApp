@@ -3,6 +3,7 @@ import 'package:music_app/providers/loginstate_provider.dart';
 import 'package:music_app/views/add_playlist_screen.dart';
 import 'package:music_app/views/edit_playlist_screen.dart';
 import 'package:music_app/views/login_page.dart';
+import 'package:music_app/views/playing_playlists_screen.dart';
 import 'package:music_app/views/playlists_screen.dart';
 import 'package:music_app/views/playing_page.dart';
 import 'package:music_app/views/search_page.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
           '/addPlaylist': (context) => AddPlaylistScreen(),
           '/editPlaylist': (context) => EditPlaylistScreen(),
           '/playingPage': (context) => PlayingPage(),
+          '/playingPlaylistPage': (context) => PlayingPlaylistsScreen(),
           '/searchPage': (context) => SearchPage(),
         },
       ),

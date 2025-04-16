@@ -30,9 +30,9 @@ class PlayingPageState extends State<PlayingPage>
   void initState() {
     super.initState();
 
-
     Timer.periodic(Duration(seconds: 1), (timer) {
-      final loginState = Provider.of<LoginStateProvider>(context, listen: false);
+      final loginState =
+          Provider.of<LoginStateProvider>(context, listen: false);
       final song = loginState.user.currentSong;
 
       if (isPlaying) {
@@ -166,7 +166,14 @@ class PlayingPageState extends State<PlayingPage>
                         color: Colors.white,
                         size: 36,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (song == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You do not have a song selected!")));
+                          return;
+                        }
+
+                        Navigator.pushNamed(context, "/playingPlaylistPage");
+                      },
                     ),
                   ],
                 ),

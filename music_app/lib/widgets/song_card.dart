@@ -42,14 +42,12 @@ class SongCardState extends State<SongCard> {
   void _changeSong(BuildContext context) {
     final loginState = Provider.of<LoginStateProvider>(context, listen: false);
 
-    final snackBar = SnackBar(
-      content:
-          Text('Now playing: ${widget.song.name} by ${widget.song.artist}'),
-      backgroundColor: AppColors.primary,
-    );
-
     loginState.user.currentSong = widget.song;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content:
+      Text('Now playing: ${widget.song.name} by ${widget.song.artist}'),
+      backgroundColor: AppColors.primary));
+    Navigator.popAndPushNamed(context, "/playingPage");
   }
 
   @override
