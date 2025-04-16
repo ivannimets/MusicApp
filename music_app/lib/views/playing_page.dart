@@ -30,9 +30,13 @@ class PlayingPageState extends State<PlayingPage>
   void initState() {
     super.initState();
 
+
     Timer.periodic(Duration(seconds: 1), (timer) {
+      final loginState = Provider.of<LoginStateProvider>(context, listen: false);
+      final song = loginState.user.currentSong;
+
       if (isPlaying) {
-        _updateTime(1);
+        _updateTime(1, song);
       }
     });
   }
@@ -69,13 +73,21 @@ class PlayingPageState extends State<PlayingPage>
     }
   }
 
-  void _togglePlayPause() {
+  void _togglePlayPause(SongModel? song) {
+    if (song == null) {
+      return;
+    }
+
     setState(() {
       isPlaying = !isPlaying;
     });
   }
 
-  void _updateTime(int deltaTime) {
+  void _updateTime(int deltaTime, SongModel? song) {
+    if (song == null) {
+      return;
+    }
+
     int newTime = currentTime + deltaTime;
 
     setState(() {
@@ -203,7 +215,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: Colors.white,
                       size: 50,
                     ),
-                    onPressed: () => _updateTime(-10),
+                    onPressed: () => _updateTime(-10, song),
                   ),
                   SizedBox(width: 30),
                   IconButton(
@@ -214,7 +226,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: AppColors.primary,
                       size: 90,
                     ),
-                    onPressed: _togglePlayPause,
+                    onPressed: () => _togglePlayPause(song),
                   ),
                   SizedBox(width: 30),
                   IconButton(
@@ -223,7 +235,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: Colors.white,
                       size: 50,
                     ),
-                    onPressed: () => _updateTime(10),
+                    onPressed: () => _updateTime(10, song),
                   ),
                 ],
               ),
