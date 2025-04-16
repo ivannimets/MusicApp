@@ -36,7 +36,7 @@ class PlayingPageState extends State<PlayingPage>
       final song = loginState.user.currentSong;
 
       if (isPlaying) {
-        _updateTime(1, song);
+        updateTime(1, song);
       }
     });
   }
@@ -44,10 +44,10 @@ class PlayingPageState extends State<PlayingPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchAlbumCover();
+    fetchAlbumCover();
   }
 
-  Future<void> _fetchAlbumCover() async {
+  Future<void> fetchAlbumCover() async {
     final loginState = Provider.of<LoginStateProvider>(context, listen: false);
     final song = loginState.user.currentSong;
 
@@ -73,7 +73,7 @@ class PlayingPageState extends State<PlayingPage>
     }
   }
 
-  void _togglePlayPause(SongModel? song) {
+  void togglePlayPause(CachedSong? song) {
     if (song == null) {
       return;
     }
@@ -83,7 +83,7 @@ class PlayingPageState extends State<PlayingPage>
     });
   }
 
-  void _updateTime(int deltaTime, SongModel? song) {
+  void updateTime(int deltaTime, CachedSong? song) {
     if (song == null) {
       return;
     }
@@ -95,7 +95,7 @@ class PlayingPageState extends State<PlayingPage>
     });
   }
 
-  String _formatTime(int time) {
+  String formatTime(int time) {
     int minutes = time ~/ 60;
     int seconds = time % 60;
 
@@ -107,7 +107,7 @@ class PlayingPageState extends State<PlayingPage>
     final loginState = Provider.of<LoginStateProvider>(context);
     int selectedIndex = 0;
 
-    SongModel? song = loginState.user.currentSong;
+    CachedSong? song = loginState.user.currentSong;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -187,14 +187,14 @@ class PlayingPageState extends State<PlayingPage>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _formatTime(currentTime),
+                          formatTime(currentTime),
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 18,
                           ),
                         ),
                         Text(
-                          _formatTime(songLength),
+                          formatTime(songLength),
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 18,
@@ -215,7 +215,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: Colors.white,
                       size: 50,
                     ),
-                    onPressed: () => _updateTime(-10, song),
+                    onPressed: () => updateTime(-10, song),
                   ),
                   SizedBox(width: 30),
                   IconButton(
@@ -226,7 +226,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: AppColors.primary,
                       size: 90,
                     ),
-                    onPressed: () => _togglePlayPause(song),
+                    onPressed: () => togglePlayPause(song),
                   ),
                   SizedBox(width: 30),
                   IconButton(
@@ -235,7 +235,7 @@ class PlayingPageState extends State<PlayingPage>
                       color: Colors.white,
                       size: 50,
                     ),
-                    onPressed: () => _updateTime(10, song),
+                    onPressed: () => updateTime(10, song),
                   ),
                 ],
               ),

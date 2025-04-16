@@ -1,4 +1,4 @@
-class SongModel {
+class CachedSong {
   String uuid;
   String albumUUID;
   String name;
@@ -6,7 +6,7 @@ class SongModel {
   int duration;
   int currentDuration;
 
-  SongModel({
+  CachedSong({
     this.uuid = '',
     this.albumUUID = '',
     this.name = 'Unknown Title',
