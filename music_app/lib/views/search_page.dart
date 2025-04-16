@@ -123,7 +123,7 @@ class SearchPageState extends State<SearchPage> {
                     bool hasArtist =
                     _searchResults[index].containsKey('name');
                     return SongCard(
-                      song: SongModel(
+                      song: CachedSong(
                           uuid: '',
                           albumUUID:
                           _getReleaseId(_searchResults[index]),

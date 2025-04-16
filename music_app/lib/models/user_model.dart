@@ -7,7 +7,7 @@ class UserModel {
   bool isLoggedIn;
   String errorMessage;
 
-  SongModel? currentSong;
+  CachedSong? currentSong;
 
   UserModel({
     this.username = '',

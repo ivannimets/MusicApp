@@ -8,7 +8,7 @@ import '../models/song_model.dart';
 import '../providers/loginstate_provider.dart';
 
 class SongCard extends StatefulWidget {
-  final SongModel song;
+  final CachedSong song;
 
   const SongCard({super.key, required this.song});
 
