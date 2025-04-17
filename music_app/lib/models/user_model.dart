@@ -1,4 +1,4 @@
-import 'package:music_app/models/song_model.dart';
+import 'package:music_app/models/cached_song.dart';
 
 class UserModel {
 

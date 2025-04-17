@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:music_app/core/app_colors.dart';
-import 'package:music_app/models/song_model.dart';
+import 'package:music_app/models/cached_song.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:music_app/widgets/song_card.dart';
 
@@ -15,22 +15,22 @@ class SearchPage extends StatefulWidget {
 }
 
 class SearchPageState extends State<SearchPage> {
-  final TextEditingController _searchController = TextEditingController();
-  List<dynamic> _searchResults = [];
-  bool _isLoading = false;
-  Timer? _debounce;
+  final TextEditingController searchController = TextEditingController();
+  List<dynamic> searchResults = [];
+  bool isLoading = false;
+  Timer? debounce;
 
-  Future<void> _searchMusic(String query) async {
+  Future<void> searchMusic(String query) async {
     if (query.isEmpty) {
       setState(() {
-        _searchResults = [];
+        searchResults = [];
       });
       return;
     }
 
     setState(() {
-      _isLoading = true;
-      _searchResults = [];
+      isLoading = true;
+      searchResults = [];
     });
 
     final songResponse = await http.get(Uri.parse(
@@ -40,17 +40,17 @@ class SearchPageState extends State<SearchPage> {
       final songData = json.decode(songResponse.body);
 
       setState(() {
-        _searchResults = songData['recordings'];
-        _isLoading = false;
+        searchResults = songData['recordings'];
+        isLoading = false;
       });
     } else {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     }
   }
 
-  String _getArtistName(dynamic item) {
+  String getArtistName(dynamic item) {
     if (item['artist-credit'] != null && item['artist-credit'].isNotEmpty) {
       return item['artist-credit'][0]['name'] ?? 'Unknown Artist';
     }
@@ -64,11 +64,11 @@ class SearchPageState extends State<SearchPage> {
     return item['releases'][0]['id'];
   }
 
-  void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
+  void onSearchChanged(String query) {
+    if (debounce?.isActive ?? false) debounce?.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 250), () {
-      _searchMusic(query);
+    debounce = Timer(const Duration(milliseconds: 250), () {
+      searchMusic(query);
     });
   }
 
@@ -81,8 +81,8 @@ class SearchPageState extends State<SearchPage> {
           children: [
             SizedBox(height: 80),
             TextField(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
+              controller: searchController,
+              onChanged: onSearchChanged,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18,
@@ -100,12 +100,12 @@ class SearchPageState extends State<SearchPage> {
               ),
             ),
             SizedBox(height: 20),
-            _isLoading
+            isLoading
                 ? CircularProgressIndicator(
               valueColor:
               AlwaysStoppedAnimation<Color>(AppColors.primary),
             )
-                : _searchResults.isEmpty || _searchController.text.isEmpty
+                : searchResults.isEmpty || searchController.text.isEmpty
                 ? Text(
               'No results found.',
               style: TextStyle(color: Colors.white70, fontSize: 18),
@@ -117,22 +117,21 @@ class SearchPageState extends State<SearchPage> {
                 radius: Radius.circular(10),
                 scrollbarOrientation: ScrollbarOrientation.right,
                 child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _searchResults.length,
+                  itemCount: searchResults.length,
                   itemBuilder: (context, index) {
                     bool hasArtist =
-                    _searchResults[index].containsKey('name');
+                    searchResults[index].containsKey('name');
                     return SongCard(
                       song: CachedSong(
-                          uuid: _searchResults[index]['id'] ?? "",
+                          uuid: searchResults[index]['id'] ?? "",
                           albumUUID:
-                          _getReleaseId(_searchResults[index]),
-                          name: _searchResults[index]['title'] ??
+                          _getReleaseId(searchResults[index]),
+                          name: searchResults[index]['title'] ??
                               'Unknown Title',
                           artist: hasArtist
-                              ? _searchResults[index]['name'] ??
+                              ? searchResults[index]['name'] ??
                               'Unknown Artist'
-                              : _getArtistName(_searchResults[index]),
+                              : getArtistName(searchResults[index]),
                           duration: 100,
                           currentDuration: 0),
                     );

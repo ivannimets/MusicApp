@@ -4,7 +4,7 @@ import 'package:music_app/core/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
-import '../models/song_model.dart';
+import '../models/cached_song.dart';
 import '../providers/loginstate_provider.dart';
 
 class SongCard extends StatefulWidget {
