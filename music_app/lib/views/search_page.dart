@@ -74,6 +74,10 @@ class SearchPageState extends State<SearchPage> {
   }
 
   String _getReleaseId(dynamic item) {
+    if (item['releases'] == null || item['releases'][0] == null) {
+      return "";
+    }
+
     return item['releases'][0]['id'];
   }
 
