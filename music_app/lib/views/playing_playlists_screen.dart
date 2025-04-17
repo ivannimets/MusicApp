@@ -43,7 +43,8 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
   }
 
   Future<void> addToPlaylist(int playlistId, String songUUID) async {
-    final songListResult = await DBHelper.dbMusicApp.getSongsOfPlaylist(playlistId);
+    final songListResult =
+        await DBHelper.dbMusicApp.getSongsOfPlaylist(playlistId);
 
     if (songListResult.songList.any((song) => song.songLink == songUUID)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,14 +59,26 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
     final addSongResult = await DBHelper.dbMusicApp
         .addSongToPlaylist(Song(songLink: songUUID), playlistId);
 
+    setState(() {
+      fetchPlaylists();
+    });
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Successfully added song to the playlist!"),
-        backgroundColor: addSongResult.isSuccess ? AppColors.primary : Colors.redAccent,
+        content: Text(
+          addSongResult.isSuccess
+              ? "Successfully added song to the playlist!"
+              : "Failed to add song to playlist",
+          style: TextStyle(
+              color: addSongResult.isSuccess
+                  ? AppColors.background
+                  : AppColors.textPrimary),
+        ),
+        backgroundColor:
+            addSongResult.isSuccess ? AppColors.primary : Colors.redAccent,
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,10 +134,22 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                             final Playlist playlist = playlists[index];
                             return Card(
                               child: ListTile(
-                                leading: SizedBox(
-                                  height: 50,
-                                  width: 50,
-                                  child: Image.network(playlist.imageLink),
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: SizedBox(
+                                    height: 50,
+                                    width: 50,
+                                    child: playlist.imageLink != null &&
+                                            playlist.imageLink!.isNotEmpty
+                                        ? Image.network(
+                                            playlist.imageLink!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/placeholder.jpg',
+                                            fit: BoxFit.cover,
+                                          ),
+                                  ),
                                 ),
                                 title: Row(
                                   children: [
@@ -165,6 +190,12 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                             );
                           },
                         ),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Done"),
+              ),
             ),
           ],
         ),
