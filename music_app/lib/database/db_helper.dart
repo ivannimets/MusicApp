@@ -77,6 +77,8 @@ class DBHelper {
         2
       )
     ''');
+
+    await db.execute('''INSERT INTO playlist_songs(playlistId, songLink) VALUES (1, '1e4f5547-5175-4d18-bd5a-83fda618c964')''');
   }
 
   Future<DBPlaylistResult> getAllPlaylists() async {
