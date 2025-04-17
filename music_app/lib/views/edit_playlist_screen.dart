@@ -15,7 +15,7 @@ class EditPlaylistScreen extends StatefulWidget {
 
 class EditPlaylistScreenState extends State<EditPlaylistScreen> {
   final FormGroup frmPlaylist = FormGroup({
-    'image': FormControl<String>(validators: [Validators.required]),
+    'image': FormControl<String>(validators: []),
     'public': FormControl<bool>(validators: []),
     'name': FormControl<String>(validators: [Validators.required]),
     'description': FormControl<String>(validators: [Validators.required]),
@@ -24,6 +24,10 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
 
   bool isPlaylistDetailsLoaded = false;
   List<DropdownMenuItem<int>> genres = [];
+  late Image playlistImage = Image.asset(
+    'assets/images/placeholder.jpg',
+    fit: BoxFit.cover,
+  );
 
   @override
   void initState() {
@@ -52,6 +56,19 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
 
     if (result.playlistList.isNotEmpty && !isPlaylistDetailsLoaded) {
       Playlist playlist = result.playlistList[0];
+
+      if (playlist.imageLink != null && playlist.imageLink!.isNotEmpty) {
+        playlistImage = Image.network(
+          playlist.imageLink!,
+          fit: BoxFit.cover,
+        );
+      } else {
+        playlistImage = Image.asset(
+          'assets/images/placeholder.jpg',
+          fit: BoxFit.cover,
+        );
+      }
+
       frmPlaylist.control('image').value = playlist.imageLink;
       frmPlaylist.control('public').value = playlist.isPublic;
       frmPlaylist.control('name').value = playlist.name;
@@ -64,6 +81,22 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     }
   }
 
+  void fetchImage() {
+    setState(() {
+      if (frmPlaylist.control("image").value.toString().isNotEmpty) {
+        playlistImage = Image.network(
+          frmPlaylist.control("image").value,
+          fit: BoxFit.cover,
+        );
+      } else {
+        playlistImage = Image.asset(
+          'assets/images/placeholder.jpg',
+          fit: BoxFit.cover,
+        );
+      }
+    });
+  }
+
   Future<void> editPlaylist() async {
     final args = ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
     Playlist playlist;
@@ -74,7 +107,6 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     });
 
     if (frmPlaylist.valid) {
-      print("I AM HERE 1");
       playlist = Playlist(
         playlistId: args.playlistId,
         isPublic: frmPlaylist.control('public').value as bool,
@@ -122,11 +154,13 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 130,
-                          height: 130,
-                          color: AppColors.backgroundSecondary,
-                          child: Image.network("#"),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            height: 130,
+                            width: 130,
+                            child: playlistImage,
+                          ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -139,7 +173,8 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                                 formControlName: 'image',
                                 decoration:
                                 InputDecoration(labelText: 'Playlist Image Link'),
-                                style: TextStyle(color: AppColors.textPrimary),
+                                style: TextStyle(color: AppColors.textSecondary),
+                                onChanged: (context) => fetchImage(),
                               ),
                               const SizedBox(height: 20),
                               Text("Public Playlist", style: TextStyle(color: AppColors.textPrimary),),
@@ -161,7 +196,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       key: const Key('PlaylistName'),
                       formControlName: 'name',
                       decoration: InputDecoration(labelText: 'Playlist Name'),
-                      style: TextStyle(color: AppColors.textPrimary),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 20),
                     ReactiveTextField(
@@ -169,17 +204,17 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       formControlName: 'description',
                       decoration:
                       InputDecoration(labelText: 'Playlist Description'),
-                      style: TextStyle(color: AppColors.textPrimary),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 20),
                     ReactiveDropdownField(
                       key: const Key('PlaylistGenreId'),
                       formControlName: 'genre',
                       items: genres,
-                      style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
-                      dropdownColor: AppColors.backgroundSecondary,
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 18),
+                      dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(10),
-                      hint: Text("Select a Genre", style: TextStyle(color: AppColors.textPrimary),),
+                      hint: Text("Select a Genre", style: TextStyle(color: AppColors.textSecondary),),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

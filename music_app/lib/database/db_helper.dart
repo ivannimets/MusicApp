@@ -73,7 +73,7 @@ class DBHelper {
         0,
         'My First Playlist',
         'Just for me',
-        '#',
+        '',
         2
       )
     ''');

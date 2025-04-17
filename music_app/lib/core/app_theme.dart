@@ -22,7 +22,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textSecondary,
           textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
@@ -36,6 +36,10 @@ class AppTheme {
         ),
         fillColor: Colors.white,
         filled: true,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.primary,
+        contentTextStyle: TextStyle(color: AppColors.textSecondary),
       ),
       textTheme: TextTheme(
         displayLarge: TextStyle(

@@ -3,12 +3,12 @@ class Playlist {
   late bool isPublic;
   late String name;
   late String description;
-  late String imageLink;
+  String? imageLink;
   List<Song>? songs;
   late int genreId;
   late Genre? genre;
 
-  Playlist({this.playlistId, required this.isPublic, required this.name, required this.description, required this.imageLink, this.songs, required this.genreId, this.genre});
+  Playlist({this.playlistId, required this.isPublic, required this.name, required this.description, this.imageLink, this.songs, required this.genreId, this.genre});
 
   Playlist.fromMap(Map<String, dynamic> map) {
     if (map.isEmpty) {

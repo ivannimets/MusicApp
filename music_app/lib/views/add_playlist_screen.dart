@@ -14,7 +14,7 @@ class AddPlaylistScreen extends StatefulWidget {
 
 class AddPlaylistScreenState extends State<AddPlaylistScreen> {
   final FormGroup frmPlaylist = FormGroup({
-    'image': FormControl<String>(validators: [Validators.required]),
+    'image': FormControl<String>(validators: []),
     'public': FormControl<bool>(value: false, validators: []),
     'name': FormControl<String>(validators: [Validators.required]),
     'description': FormControl<String>(validators: [Validators.required]),
@@ -22,6 +22,10 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
   });
 
   List<DropdownMenuItem<int>> genres = [];
+  Image playlistImage = Image.asset(
+    'assets/images/placeholder.jpg',
+    fit: BoxFit.cover,
+  );
 
   @override
   void initState() {
@@ -44,18 +48,31 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     });
   }
 
+  void fetchImage() {
+    setState(() {
+      if (frmPlaylist.control("image").value.toString().isNotEmpty) {
+        playlistImage = Image.network(
+          frmPlaylist.control("image").value,
+          fit: BoxFit.cover,
+        );
+      } else {
+        playlistImage = Image.asset(
+          'assets/images/placeholder.jpg',
+          fit: BoxFit.cover,
+        );
+      }
+    });
+  }
+
   Future<void> addPlaylist() async {
     Playlist playlist;
-    print("I AM HERE");
 
     frmPlaylist.controls.forEach((key, control) {
       control.markAsTouched();
       control.updateValueAndValidity();
     });
-    print("I AM HERE 2");
 
     if (frmPlaylist.valid) {
-      print("I AM HERE 3");
       playlist = Playlist(
         isPublic: frmPlaylist.control('public').value as bool,
         name: frmPlaylist.control('name').value,
@@ -63,14 +80,11 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
         imageLink: frmPlaylist.control('image').value,
         genreId: frmPlaylist.control('genre').value as int,
       );
-      print("I AM HERE 4");
 
       DBPlaylistResult result =
           await DBHelper.dbMusicApp.insertPlaylist(playlist);
-      print("I AM HERE 5");
 
       if (mounted) {
-        print("I AM HERE 6");
         Navigator.popAndPushNamed(context, "/playlistsPage");
       }
     }
@@ -99,11 +113,13 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 130,
-                            height: 130,
-                            color: AppColors.backgroundSecondary,
-                            child: Image.network("#"),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              height: 130,
+                              width: 130,
+                              child: playlistImage,
+                            ),
                           ),
                           const SizedBox(width: 20),
                           Expanded(
@@ -116,7 +132,8 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                                   formControlName: 'image',
                                   decoration:
                                   InputDecoration(labelText: 'Playlist Image Link'),
-                                  style: TextStyle(color: AppColors.textPrimary),
+                                  style: TextStyle(color: AppColors.textSecondary),
+                                  onChanged: (context) => fetchImage(),
                                 ),
                                 const SizedBox(height: 20),
                                 Text("Public Playlist", style: TextStyle(color: AppColors.textPrimary),),
@@ -138,7 +155,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         key: const Key('PlaylistName'),
                         formControlName: 'name',
                         decoration: InputDecoration(labelText: 'Playlist Name'),
-                        style: TextStyle(color: AppColors.textPrimary),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 20),
                       ReactiveTextField(
@@ -146,17 +163,17 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         formControlName: 'description',
                         decoration:
                             InputDecoration(labelText: 'Playlist Description'),
-                        style: TextStyle(color: AppColors.textPrimary),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 20),
                       ReactiveDropdownField(
                         key: const Key('PlaylistGenreId'),
                         formControlName: 'genre',
                         items: genres,
-                        style: TextStyle(color: AppColors.textPrimary),
-                        dropdownColor: AppColors.backgroundSecondary,
+                        style: TextStyle(color: AppColors.textSecondary),
+                        dropdownColor: Colors.white,
                         borderRadius: BorderRadius.circular(10),
-                        hint: Text("Select a Genre", style: TextStyle(color: AppColors.textPrimary),),
+                        hint: Text("Select a Genre", style: TextStyle(color: AppColors.textSecondary),),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -168,7 +185,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.secondary,
-                            foregroundColor: AppColors.background,
+                            foregroundColor: AppColors.textSecondary,
                             textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         child: Text("Cancel"),
