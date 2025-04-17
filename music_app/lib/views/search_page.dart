@@ -52,12 +52,25 @@ class SearchPageState extends State<SearchPage> {
 
   String getArtistName(dynamic item) {
     if (item['artist-credit'] != null && item['artist-credit'].isNotEmpty) {
-      return item['artist-credit'][0]['name'] ?? 'Unknown Artist';
+      String artist = item['artist-credit'][0]['name'] ?? "Unknown Artist";
+      if (artist.length > 15) artist = "${artist.substring(0, 15)}...";
+
+      return artist;
     }
     if (item['name'] != null) {
       return item['name'] ?? 'Unknown Artist';
     }
     return 'Unknown Artist';
+  }
+
+  String getSongName(dynamic item) {
+    if (item['title'] != null && item['title'].isNotEmpty) {
+      String title = item['title'] ?? "Unknown Title";
+      if (title.length > 15) title = "${title.substring(0, 15)}...";
+
+      return title;
+    }
+    return 'Unknown Title';
   }
 
   String _getReleaseId(dynamic item) {
@@ -126,8 +139,7 @@ class SearchPageState extends State<SearchPage> {
                           uuid: searchResults[index]['id'] ?? "",
                           albumUUID:
                           _getReleaseId(searchResults[index]),
-                          name: searchResults[index]['title'] ??
-                              'Unknown Title',
+                          name: getSongName(searchResults[index]),
                           artist: hasArtist
                               ? searchResults[index]['name'] ??
                               'Unknown Artist'
