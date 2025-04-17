@@ -31,6 +31,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       if (result.isSuccess) {
         _playlists = result.playlistList;
       } else {
+        _playlists = [];
         _message = result.message;
       }
 
@@ -42,8 +43,8 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Confirm Deletion"),
-        content: Text("Are you sure you want to delete this Playlist?"),
+        title: Text("Confirm Deletion", style: TextStyle(color: AppColors.textSecondary)),
+        content: Text("Are you sure you want to delete this Playlist?", style: TextStyle(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -71,9 +72,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       ).showSnackBar(SnackBar(content: Text(result.message)));
 
       if (result.isSuccess) {
-        setState(() {
-          fetchPlaylists();
-        });
+        fetchPlaylists();
       }
     }
   }
