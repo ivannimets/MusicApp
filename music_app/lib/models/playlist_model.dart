@@ -28,7 +28,7 @@ class Playlist {
       'isPublic': isPublic,
       'name': name,
       'description': description,
-      'imageLink': imageLink,
+      'imageLink': imageLink ?? "",
       'genreId': genreId
     };
     return map;
