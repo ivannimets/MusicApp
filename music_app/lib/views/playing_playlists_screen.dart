@@ -4,7 +4,7 @@ import 'package:music_app/database/db_helper.dart';
 import 'package:music_app/models/db_result.dart';
 import 'package:music_app/models/playlist_arguments_model.dart';
 import 'package:music_app/models/playlist_model.dart';
-import 'package:music_app/models/song_model.dart';
+import 'package:music_app/models/cached_song.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:provider/provider.dart';
 
@@ -18,9 +18,9 @@ class PlayingPlaylistsScreen extends StatefulWidget {
 }
 
 class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
-  List<Playlist> _playlists = [];
-  String _message = "";
-  bool _isLoading = true;
+  List<Playlist> playlists = [];
+  String message = "";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -32,12 +32,12 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
     DBPlaylistResult result = await DBHelper.dbMusicApp.getAllPlaylists();
 
     setState(() {
-      _isLoading = false;
+      isLoading = false;
 
       if (result.isSuccess) {
-        _playlists = result.playlistList;
+        playlists = result.playlistList;
       } else {
-        _message = result.message;
+        message = result.message;
       }
     });
   }
@@ -101,24 +101,24 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
             ),
             const SizedBox(height: 5),
             Text(
-              "${_playlists.length} playlists",
+              "${playlists.length} playlists",
               style: TextStyle(color: AppColors.textPrimary),
             ),
             const SizedBox(height: 5),
             Expanded(
-              child: _isLoading
+              child: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _playlists.isEmpty
+                  : playlists.isEmpty
                       ? Center(
                           child: Text(
-                            _message,
+                            message,
                             style: TextStyle(fontSize: 16),
                           ),
                         )
                       : ListView.builder(
-                          itemCount: _playlists.length,
+                          itemCount: playlists.length,
                           itemBuilder: (context, index) {
-                            final Playlist playlist = _playlists[index];
+                            final Playlist playlist = playlists[index];
                             return Card(
                               child: ListTile(
                                 leading: SizedBox(

@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:music_app/core/app_colors.dart';
-import 'package:music_app/models/song_model.dart';
+import 'package:music_app/models/cached_song.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:provider/provider.dart';
 import '../providers/loginstate_provider.dart';
