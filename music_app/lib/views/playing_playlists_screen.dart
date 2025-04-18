@@ -18,6 +18,7 @@ class PlayingPlaylistsScreen extends StatefulWidget {
 }
 
 class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
+  //List of the playlists
   List<Playlist> playlists = [];
   String message = "";
   bool isLoading = true;
@@ -25,12 +26,15 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
   @override
   void initState() {
     super.initState();
+    //Fetches the playlists
     fetchPlaylists();
   }
 
+  //Method to populate the playlists List from the Database
   Future<void> fetchPlaylists() async {
     DBPlaylistResult result = await DBHelper.dbMusicApp.getAllPlaylists();
 
+    //Either sets the error message, or the List of playlists
     setState(() {
       isLoading = false;
 
@@ -42,10 +46,13 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
     });
   }
 
+  //Method to add a song to the playlist and add it to the DB
   Future<void> addToPlaylist(int playlistId, String songUUID) async {
+    //Gets the current Songs in the playlist, to allow us to check if its a duplicate
     final songListResult =
         await DBHelper.dbMusicApp.getSongsOfPlaylist(playlistId);
 
+    //Checks if the song is a duplicate and shows a snackbar if it is.
     if (songListResult.songList.any((song) => song.songLink == songUUID)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -56,13 +63,16 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
       return;
     }
 
+    //Gets the DB Result of adding the song to the playlist
     final addSongResult = await DBHelper.dbMusicApp
         .addSongToPlaylist(Song(songLink: songUUID), playlistId);
 
+    //Refetches the playlists
     setState(() {
       fetchPlaylists();
     });
 
+    //Shows a snackbar with the outcome of the operation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -82,7 +92,9 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //Grabs the global login state
     final loginState = Provider.of<LoginStateProvider>(context);
+    //Grabs the user's currently playing song
     CachedSong? song = loginState.user.currentSong;
 
     return Scaffold(
@@ -119,6 +131,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
             ),
             const SizedBox(height: 5),
             Expanded(
+              //Loops through the list of playlists and creates a card for each one
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : playlists.isEmpty
@@ -139,6 +152,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                                   child: SizedBox(
                                     height: 50,
                                     width: 50,
+                                    //Grabs the image or the placeholder image
                                     child: playlist.imageLink != null &&
                                             playlist.imageLink!.isNotEmpty
                                         ? Image.network(
@@ -151,6 +165,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                                           ),
                                   ),
                                 ),
+                                //Shows the Playlist name and then the Genre
                                 title: Row(
                                   children: [
                                     Text(
@@ -167,6 +182,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                                     ),
                                   ],
                                 ),
+                                //Shows the description and song count for the playlist
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -174,6 +190,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                                     Text("${playlist.songs!.length} songs"),
                                   ],
                                 ),
+                                //Adds the button that runs the method to add song to the playlist
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -191,6 +208,7 @@ class PlayingPlaylistsScreenState extends State<PlayingPlaylistsScreen> {
                           },
                         ),
             ),
+            //Button to go back to the playing screen
             Center(
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
