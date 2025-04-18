@@ -14,12 +14,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  //Default Username & Password are:
+  //user
+  //password
+
   //Creates the input field controllers for username & password
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
+    //Disposes the input field controllers for username and password
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -31,6 +36,7 @@ class LoginPageState extends State<LoginPage> {
     final loginState = Provider.of<LoginStateProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      //Makes the page scrollable for safety
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -38,6 +44,7 @@ class LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 40),
+              //Displays the logo and name of the app
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -53,6 +60,7 @@ class LoginPageState extends State<LoginPage> {
                 ],
               ),
               SizedBox(height: 20),
+              //Instructional label
               Center(
                 child: Text(
                   "Log in to continue.",
@@ -60,28 +68,34 @@ class LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 30),
+              //Label for the username field
               Text(
                 "Username",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
+              //Input field for the username
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(
+                  //Sets the hint of the input field
                   hintText: "Username",
                   hintStyle: TextStyle(fontSize: 18),
                   border: OutlineInputBorder(),
+                  //Sets and icon for the input field
                   prefixIcon: Icon(Icons.person),
                 ),
                 style: TextStyle(color: Colors.black),
                 onChanged: (value) => loginState.user.username = value,
               ),
               SizedBox(height: 30),
+              //Label for the password field
               Text(
                 "Password",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               TextField(
                 controller: passwordController,
+                //Hides the inputted password (********)
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password",
@@ -93,6 +107,7 @@ class LoginPageState extends State<LoginPage> {
                 onChanged: (value) => loginState.user.password = value,
               ),
               SizedBox(height: 30),
+              //Creates the login button and calls the login() method from the loginState
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -110,6 +125,7 @@ class LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 20),
+              //Adds a purely cosmetic Forgot Password link
               Center(
                   child: GestureDetector(
                 onTap: () {},
@@ -123,6 +139,7 @@ class LoginPageState extends State<LoginPage> {
                   ),
                 ),
               )),
+              //Confirms the login succeeded from the loginState and then pushes the user to the playingPage (Home Screen)
               Consumer<LoginStateProvider>(
                 builder: (context, loginState, child) {
                   if (loginState.user.errorMessage.isEmpty &&
@@ -132,6 +149,7 @@ class LoginPageState extends State<LoginPage> {
                     });
                     return Container();
                   }
+                  //Displays the error message when it exists
                   return loginState.user.errorMessage.isNotEmpty
                       ? Center(
                           child: Text(

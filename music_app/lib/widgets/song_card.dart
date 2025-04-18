@@ -8,6 +8,7 @@ import '../models/cached_song.dart';
 import '../providers/loginstate_provider.dart';
 
 class SongCard extends StatefulWidget {
+  //Stores the displayed cached song
   final CachedSong song;
 
   const SongCard({super.key, required this.song});
@@ -22,31 +23,40 @@ class SongCardState extends State<SongCard> {
   @override
   void initState() {
     super.initState();
-    _fetchAlbumCover();
+    //Fetches the album cover to be displayed
+    fetchAlbumCover();
   }
 
-  Future<void> _fetchAlbumCover() async {
+  Future<void> fetchAlbumCover() async {
+    //Builds the request to MusicBrainz' cover art archive
     final response = await http.get(Uri.parse(
         'https://coverartarchive.org/release/${widget.song.albumUUID}'));
 
     if (response.statusCode == 200) {
+      //Gets the json data from the response
       final data = json.decode(response.body);
       if (mounted) {
         setState(() {
+          //Grabs the image from the response
           albumCoverURL = data['images'][0]['image'];
         });
       }
     }
   }
 
-  void _changeSong(BuildContext context) {
+  //Method to change the user's current playing song
+  void changeSong(BuildContext context) {
+    //Grabs the loginState, without listening
     final loginState = Provider.of<LoginStateProvider>(context, listen: false);
 
+    //Updates the logged in user's current song
     loginState.user.currentSong = widget.song;
+    //Shows a snack bar displaying which song is now playing
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content:
       Text('Now playing: ${widget.song.name} by ${widget.song.artist}'),
       backgroundColor: AppColors.primary));
+    //Navigates the user back to the playing page
     Navigator.popAndPushNamed(context, "/playingPage");
   }
 
@@ -54,6 +64,7 @@ class SongCardState extends State<SongCard> {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.grey[900],
+      //Creates a rounded border around the card
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -62,6 +73,7 @@ class SongCardState extends State<SongCard> {
         contentPadding: EdgeInsets.all(16),
         title: Row(
           children: [
+            //Adds a circular border around the song's cover art
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: albumCoverURL.isNotEmpty
@@ -79,6 +91,7 @@ class SongCardState extends State<SongCard> {
                     ),
             ),
             SizedBox(width: 16),
+            //Adds a flexible widget to display the song name and artist name
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,12 +119,14 @@ class SongCardState extends State<SongCard> {
             ),
           ],
         ),
+        //Creates the play icon button on the song
         trailing: Icon(
           Icons.play_arrow,
           color: Colors.green,
           size: 30,
         ),
-        onTap: () => _changeSong(context),
+        //Handles the user tap to change the song
+        onTap: () => changeSong(context),
       ),
     );
   }
