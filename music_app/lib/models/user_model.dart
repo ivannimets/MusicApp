@@ -7,6 +7,7 @@ class UserModel {
   bool isLoggedIn;
   String errorMessage;
 
+  //Current instance of the playing song
   CachedSong? currentSong;
 
   UserModel({

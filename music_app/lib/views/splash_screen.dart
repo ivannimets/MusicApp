@@ -20,11 +20,13 @@ class SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
+    //Creates an animation controller to spin the icon
     controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat();
 
+    //Pushes the user to the login screen after 3 seconds
     Timer(Duration(seconds: 3), () {
       Navigator.pushNamedAndRemoveUntil(context, '/loginPage', (route) => false);
     });
@@ -41,6 +43,7 @@ class SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
+        //Builds an animation using the already defined controller, Rotates the child
         child: AnimatedBuilder(
           animation: controller,
           builder: (context, child) {
@@ -49,6 +52,7 @@ class SplashScreenState extends State<SplashScreen>
               child: child,
             );
           },
+            //Adds the icon that will be displayed and animated
           child: Icon(Icons.music_note, color: AppColors.textPrimary, size: 50,)),
         ),
       );
