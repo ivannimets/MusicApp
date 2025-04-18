@@ -6,6 +6,8 @@ import 'package:music_app/models/playlist_arguments_model.dart';
 import 'package:music_app/models/playlist_model.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 
+import '../widgets/drawer_menu.dart';
+
 class PlaylistsScreen extends StatefulWidget {
   const PlaylistsScreen({super.key});
 
@@ -86,6 +88,8 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       appBar: AppBar(
         title: Text("Music App"),
       ),
+
+      drawer: const CustomDrawer(),
       bottomNavigationBar: CustomBottomNavBar(
           context: context,
           currentIndex: 2,

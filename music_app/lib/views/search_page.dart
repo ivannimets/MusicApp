@@ -7,6 +7,8 @@ import 'package:music_app/models/song_model.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:music_app/widgets/song_card.dart';
 
+import '../widgets/drawer_menu.dart';
+
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -75,6 +77,10 @@ class SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Music App"),
+      ),
+      drawer: const CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
