@@ -8,6 +8,7 @@ import 'package:music_app/models/cached_song.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
 import 'package:provider/provider.dart';
 import '../providers/loginstate_provider.dart';
+import '../widgets/drawer_menu.dart';
 
 class PlayingPage extends StatefulWidget {
   const PlayingPage({super.key});
@@ -110,6 +111,10 @@ class PlayingPageState extends State<PlayingPage>
     CachedSong? song = loginState.user.currentSong;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Music App"),
+      ),
+      drawer: const CustomDrawer(),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
