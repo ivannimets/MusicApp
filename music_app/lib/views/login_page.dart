@@ -14,6 +14,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  //Creates the input field controllers for username & password
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -26,6 +27,7 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    //Retrieves the global login state provider
     final loginState = Provider.of<LoginStateProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,

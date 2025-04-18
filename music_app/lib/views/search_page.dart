@@ -102,7 +102,7 @@ class SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            SizedBox(height: 80),
+            SizedBox(height: 20),
             TextField(
               controller: searchController,
               onChanged: onSearchChanged,
