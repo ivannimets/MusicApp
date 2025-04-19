@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music_app/core/app_colors.dart';
 import 'package:music_app/database/db_helper.dart';
 import 'package:music_app/models/db_result.dart';
-import 'package:music_app/models/playlist_arguments_model.dart';
 import 'package:music_app/models/playlist_model.dart';
 import 'package:music_app/models/cached_song.dart';
 import 'package:music_app/widgets/bottom_nav.dart';
