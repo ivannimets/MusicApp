@@ -6,6 +6,7 @@ import 'package:music_app/models/playlist_arguments_model.dart';
 import 'package:music_app/models/playlist_model.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
+// Screen for editing an existing playlist.
 class EditPlaylistScreen extends StatefulWidget {
   const EditPlaylistScreen({super.key});
 
@@ -14,6 +15,7 @@ class EditPlaylistScreen extends StatefulWidget {
 }
 
 class EditPlaylistScreenState extends State<EditPlaylistScreen> {
+  // Reactive form for managing playlist field inputs
   final FormGroup frmPlaylist = FormGroup({
     'image': FormControl<String>(validators: []),
     'public': FormControl<bool>(validators: []),
@@ -22,8 +24,13 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     'genre': FormControl<int>(validators: [Validators.required]),
   });
 
+  // Flags whether playlist details have been loaded from the DB
   bool isPlaylistDetailsLoaded = false;
+
+  // List of genre dropdown menu items
   List<DropdownMenuItem<int>> genres = [];
+
+  // Image preview for the playlist
   late Image playlistImage = Image.asset(
     'assets/images/placeholder.jpg',
     fit: BoxFit.cover,
@@ -35,6 +42,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     _fetchGenres();
   }
 
+  // Loads available genres from local DB and builds dropdown items
   Future<void> _fetchGenres() async {
     DBGenreResult result = await DBHelper.dbMusicApp.getAllGenres();
 
@@ -50,6 +58,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     });
   }
 
+  // Loads the playlist details (ID comes from navigation arguments)
   Future<void> _loadPlaylistDetails() async {
     final args = ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
     DBPlaylistResult result = await DBHelper.dbMusicApp.getPlaylist(args.playlistId);
@@ -69,6 +78,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
         );
       }
 
+      // Populate the form fields with existing playlist values
       frmPlaylist.control('image').value = playlist.imageLink;
       frmPlaylist.control('public').value = playlist.isPublic;
       frmPlaylist.control('name').value = playlist.name;
@@ -81,6 +91,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     }
   }
 
+  // Updates the playlist image preview whenever the image URL input changes
   void fetchImage() {
     setState(() {
       if (frmPlaylist.control("image").value.toString().isNotEmpty) {
@@ -97,15 +108,18 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
     });
   }
 
+  // Validates form and updates the playlist in the database
   Future<void> editPlaylist() async {
     final args = ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
     Playlist playlist;
 
+    // Mark all controls as touched to show validation errors
     frmPlaylist.controls.forEach((key, control) {
       control.markAsTouched();
       control.updateValueAndValidity();
     });
 
+    // If the form is valid, update the playlist
     if (frmPlaylist.valid) {
       playlist = Playlist(
         playlistId: args.playlistId,
@@ -119,7 +133,8 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
       DBPlaylistResult result =
       await DBHelper.dbMusicApp.updatePlaylist(playlist);
 
-      if (mounted) {
+      // Go back to playlist list after successful update
+      if (mounted && result.isSuccess) {
         Navigator.popAndPushNamed(context, "/playlistsPage");
       }
     }
@@ -127,6 +142,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
 
     @override
   Widget build(BuildContext context) {
+    // Ensures playlist data is loaded *after* build to avoid accessing context too early
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!isPlaylistDetailsLoaded) {
         _loadPlaylistDetails();
@@ -141,19 +157,23 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
+            // Title
             Text(
               "Edit Playlist",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 20),
+            // Playlist form
             Expanded(
               child: ReactiveForm(
                 formGroup: frmPlaylist,
                 child: Column(
                   children: [
+                    // Image preview and image URL input
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Playlist cover image preview
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: SizedBox(
@@ -163,11 +183,12 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                           ),
                         ),
                         const SizedBox(width: 20),
+                        // Image link and public/private switch
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // const SizedBox(height: 50),
+                              // Input field for image URL
                               ReactiveTextField(
                                 key: const Key('PlaylistImageLink'),
                                 formControlName: 'image',
@@ -177,6 +198,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                                 onChanged: (context) => fetchImage(),
                               ),
                               const SizedBox(height: 20),
+                              // Public/private switch
                               Text("Public Playlist", style: TextStyle(color: AppColors.textPrimary),),
                               ReactiveSwitch(
                                 key: const Key('PlaylistIsPublic'),
@@ -192,6 +214,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
+                    // Playlist name input
                     ReactiveTextField(
                       key: const Key('PlaylistName'),
                       formControlName: 'name',
@@ -199,6 +222,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 20),
+                    // Playlist description input
                     ReactiveTextField(
                       key: const Key('PlaylistDescription'),
                       formControlName: 'description',
@@ -207,6 +231,7 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 20),
+                    // Genre dropdown menu
                     ReactiveDropdownField(
                       key: const Key('PlaylistGenreId'),
                       formControlName: 'genre',
@@ -217,11 +242,13 @@ class EditPlaylistScreenState extends State<EditPlaylistScreen> {
                       hint: Text("Select a Genre", style: TextStyle(color: AppColors.textSecondary),),
                     ),
                     const SizedBox(height: 20),
+                    // Save button
                     ElevatedButton(
                       onPressed: editPlaylist,
                       child: Text("Save"),
                     ),
                     const SizedBox(height: 10),
+                    // Cancel button
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(

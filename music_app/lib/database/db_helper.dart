@@ -9,6 +9,7 @@ class DBHelper {
 
   DBHelper._init();
 
+  // Enforces Singleton design pattern
   Future<Database> get musicAppDatabase async {
     // Enforce singleton instance
     if (_database != null) return _database!;
@@ -18,6 +19,7 @@ class DBHelper {
     return _database!;
   }
 
+  // Retrieves database
   Future<Database> _getDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'music_app_database.db');
@@ -29,7 +31,9 @@ class DBHelper {
     );
   }
 
+  // Sets up tables with data on database creation
   void _createDatabase(Database db, int version) async {
+    // Creates Schema for genres table
     await db.execute('''
       CREATE TABLE genres (
         genreId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,6 +41,7 @@ class DBHelper {
       )
     ''');
 
+    // Populate genres table with data
     await db.execute('''INSERT INTO genres(name) VALUES ('Country')''');
     await db.execute('''INSERT INTO genres(name) VALUES ('Pop')''');
     await db.execute('''INSERT INTO genres(name) VALUES ('Rock')''');
@@ -48,6 +53,7 @@ class DBHelper {
     await db.execute('''INSERT INTO genres(name) VALUES ('R&B')''');
     await db.execute('''INSERT INTO genres(name) VALUES ('Reggae')''');
 
+    // create playlists table
     await db.execute('''
       CREATE TABLE playlists (
         playlistId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,6 +66,7 @@ class DBHelper {
       )
     ''');
 
+    // creates playlist_songs table
     await db.execute('''
       CREATE TABLE playlist_songs (
         playlistId INTEGER,
@@ -68,6 +75,7 @@ class DBHelper {
       )
     ''');
 
+    // Populate playlists table with a default playlist
     await db.execute('''
       INSERT INTO playlists(isPublic, name, description, imageLink, genreId) VALUES (
         0,
@@ -78,30 +86,39 @@ class DBHelper {
       )
     ''');
 
+    // Add a song to the default playlist
     await db.execute('''INSERT INTO playlist_songs(playlistId, songLink) VALUES (1, '1e4f5547-5175-4d18-bd5a-83fda618c964')''');
   }
 
+  // Retrieves all Playlists in the database
   Future<DBPlaylistResult> getAllPlaylists() async {
     final db = await dbMusicApp.musicAppDatabase;
     List<Playlist> playlists = [];
 
     try {
+      // Query database for all playlists
       List<Map<String, dynamic>> result = await db.query('playlists');
 
       if (result.isNotEmpty) {
         for (Map<String, dynamic> row in result) {
+          // Initialize playlist details then add them to the list
           Playlist playlist = Playlist.fromMap(row);
+
           DBGenreResult genreResult = await getGenre(playlist.genreId);
           if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
+
           DBSongListResult songsResult = await getSongsOfPlaylist(playlist.playlistId!);
           playlist.songs = songsResult.isSuccess ? songsResult.songList : [];
+
           playlists.add(playlist);
         }
 
+        // Return appropriate Result
         return DBPlaylistResult(
             isSuccess: true,
             message: "Playlists Retrieved",
-            playlistList: playlists);
+            playlistList: playlists,
+        );
       } else {
         return DBPlaylistResult(
             isSuccess: false,
@@ -114,33 +131,40 @@ class DBHelper {
     }
   }
 
+  // Retrieves one playlist by id
   Future<DBPlaylistResult> getPlaylist(int id) async {
     final db = await dbMusicApp.musicAppDatabase;
-    List<Playlist> playlists = [];
 
     try {
+      // Query database for playlists with matching id
       List<Map<String, dynamic>> result = await db.query(
         'playlists',
         where: 'playlistId = ?',
         whereArgs: [id],
       );
-      DBSongListResult songResult = await getSongsOfPlaylist(id);
 
       if (result.isNotEmpty) {
+        // Add details to playlist and send it as a list
         Playlist playlist = Playlist.fromMap(result[0]);
+
         DBGenreResult genreResult = await getGenre(playlist.genreId);
         if (genreResult.isSuccess) playlist.genre = genreResult.genreList[0];
-        if (songResult.isSuccess) playlist.songs = songResult.songList;
-        playlists.add(playlist);
+
+        DBSongListResult songResult = await getSongsOfPlaylist(id);
+        playlist.songs = songResult.isSuccess ? songResult.songList : [];
+
+        // Return appropriate result
         return DBPlaylistResult(
             isSuccess: true,
             message: "Playlist Retrieved",
-            playlistList: playlists);
+            playlistList: [playlist],
+        );
       } else {
         return DBPlaylistResult(
             isSuccess: false,
             message: "No Matching Playlist Found",
-            playlistList: playlists);
+            playlistList: [],
+        );
       }
     } catch (e) {
       return DBPlaylistResult(
@@ -148,12 +172,15 @@ class DBHelper {
     }
   }
 
+  // Adds a new playlist to the database
   Future<DBPlaylistResult> insertPlaylist(Playlist playlistDetails) async {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
+      // Insert playlist record into database
       int playlistId = await db.insert('playlists', playlistDetails.toMap());
 
+      // Return result to indicate success of insertion
       if (playlistId > 0) {
         return DBPlaylistResult(
             isSuccess: true,
@@ -171,12 +198,14 @@ class DBHelper {
     }
   }
 
+  // updates an existing playlist record
   Future<DBPlaylistResult> updatePlaylist(Playlist playlistDetails) async {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
       int id = playlistDetails.playlistId!;
 
+      // apply update to database
       int rowsAffected = await db.update(
         'playlists',
         playlistDetails.toMap(),
@@ -184,6 +213,7 @@ class DBHelper {
         whereArgs: [id],
       );
 
+      // Return result to indicate success of insertion
       if (rowsAffected > 0) {
         return DBPlaylistResult(
             isSuccess: true,
@@ -201,16 +231,19 @@ class DBHelper {
     }
   }
 
+  // deletes an existing playlist record
   Future<DBPlaylistResult> deletePlaylist(int id) async {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
+      // Remove playlist records with matching id
       int rowsDeleted = await db.delete(
         'playlists',
         where: 'playlistId = ?',
         whereArgs: [id],
       );
 
+      // Return result to indicate success of deletion
       if (rowsDeleted > 0) {
         return DBPlaylistResult(
             isSuccess: true,
@@ -228,18 +261,22 @@ class DBHelper {
     }
   }
 
+  // Retrieves list of genres
   Future<DBGenreResult> getAllGenres() async {
     final db = await dbMusicApp.musicAppDatabase;
     List<Genre> genres = [];
 
     try {
+      // Query database for all genres, ordered
       List<Map<String, dynamic>> result = await db.query('genres', orderBy: 'name');
 
       if (result.isNotEmpty) {
+        // loop over result set to populate genre list
         for (Map<String, dynamic> genre in result) {
           genres.add(Genre.fromMap(genre));
         }
 
+        // Return appropriate result
         return DBGenreResult(
             isSuccess: true, message: "Genres Retrieved", genreList: genres);
       } else {
@@ -252,22 +289,22 @@ class DBHelper {
     }
   }
 
+  // Retrieves a specific genre by id
   Future<DBGenreResult> getGenre(int id) async {
     final db = await dbMusicApp.musicAppDatabase;
-    List<Genre> genres = [];
 
     try {
+      // Query database for genres with matching id
       List<Map<String, dynamic>> result =
           await db.query('genres', where: 'genreId = ?', whereArgs: [id]);
 
+      // Return appropriate result
       if (result.isNotEmpty) {
-        genres.add(Genre.fromMap(result[0]));
-
         return DBGenreResult(
-            isSuccess: true, message: "Genres Retrieved", genreList: genres);
+            isSuccess: true, message: "Genres Retrieved", genreList: [Genre.fromMap(result[0])]);
       } else {
         return DBGenreResult(
-            isSuccess: false, message: "No Genres Found", genreList: genres);
+            isSuccess: false, message: "No Genres Found", genreList: []);
       }
     } catch (e) {
       return DBGenreResult(
@@ -275,11 +312,13 @@ class DBHelper {
     }
   }
 
+  // Retrieves a list of song uuids associated with a playlist
   Future<DBSongListResult> getSongsOfPlaylist(int id) async {
     final db = await dbMusicApp.musicAppDatabase;
     List<Song> songs = [];
 
     try {
+      // Query database for records with matching playlistId and uuid
       List<Map<String, dynamic>> results = await db.query(
         'playlist_songs',
         columns: ['songLink'],
@@ -287,10 +326,12 @@ class DBHelper {
         whereArgs: [id],
       );
 
+      // Loops over results populate song list
       for (Map<String, dynamic> row in results) {
         songs.add(Song.fromMap(row));
       }
 
+      // Return appropriate result
       if (songs.isNotEmpty) {
         return DBSongListResult(isSuccess: true, message: "Songs retrieved", songList: songs);
       } else {
@@ -301,15 +342,18 @@ class DBHelper {
     }
   }
 
+  // Adds song to playlist
   Future<DBPlaylistResult> addSongToPlaylist(Song song, int id) async {
     final db = await dbMusicApp.musicAppDatabase;
 
     try {
+      // Insert record to playlist_songs table
       await db.insert(
         'playlist_songs',
         {'playlistId': id, 'songLink': song.songLink} as Map<String, dynamic>,
       );
 
+      // Double check insertion was successful
       List<Map<String, dynamic>> songResult = await db.query(
         'playlist_songs',
         columns: ['playlistId'],
@@ -318,6 +362,7 @@ class DBHelper {
       );
       int playlistId = songResult[0]['playlistId'];
 
+      // Return appropriate result
       if (playlistId > 0) {
         return DBPlaylistResult(
             isSuccess: true,
@@ -327,6 +372,36 @@ class DBHelper {
         return DBPlaylistResult(
             isSuccess: false,
             message: "Failed to Add Song to Playlist",
+            playlistList: []);
+      }
+    } catch (e) {
+      return DBPlaylistResult(
+          isSuccess: false, message: "Error: $e", playlistList: []);
+    }
+  }
+
+  // Removes song from playlist
+  Future<DBPlaylistResult> deleteSongFromPlaylist(int playlistId, String uuid) async {
+    final db = await dbMusicApp.musicAppDatabase;
+
+    try {
+      // Remove record from playlist_songs table
+      int rowsDeleted = await db.delete(
+        'playlist_songs',
+        where: 'playlistId = ? AND songLink = ?',
+        whereArgs: [playlistId, uuid],
+      );
+
+      // Return appropriate result
+      if (rowsDeleted > 0) {
+        return DBPlaylistResult(
+            isSuccess: true,
+            message: "Song Deleted From Playlist Successfully",
+            playlistList: []);
+      } else {
+        return DBPlaylistResult(
+            isSuccess: false,
+            message: "Failed to Delete Song From Playlist",
             playlistList: []);
       }
     } catch (e) {

@@ -5,6 +5,7 @@ import 'package:music_app/views/contact_page.dart';
 import 'package:music_app/views/edit_playlist_screen.dart';
 import 'package:music_app/views/login_page.dart';
 import 'package:music_app/views/playing_playlists_screen.dart';
+import 'package:music_app/views/playlist_page.dart';
 import 'package:music_app/views/playlists_screen.dart';
 import 'package:music_app/views/playing_page.dart';
 import 'package:music_app/views/search_page.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
           '/playingPlaylistPage': (context) => PlayingPlaylistsScreen(),
           '/searchPage': (context) => SearchPage(),
           '/contactPage': (context) => ContactPage(),
+          '/playlistPage': (context) => PlaylistPage(),
         },
       ),
     );

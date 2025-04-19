@@ -1,5 +1,6 @@
 import 'package:music_app/models/playlist_model.dart';
 
+// Standardizes Database results according to table queried
 class DBPlaylistResult {
   final bool isSuccess;
   final String message;

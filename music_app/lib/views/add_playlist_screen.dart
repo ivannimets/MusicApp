@@ -5,6 +5,8 @@ import 'package:music_app/models/db_result.dart';
 import 'package:music_app/models/playlist_model.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
+// Screen for adding a new playlist with name, description,
+// genre, image, and public/private toggle.
 class AddPlaylistScreen extends StatefulWidget {
   const AddPlaylistScreen({super.key});
 
@@ -13,6 +15,7 @@ class AddPlaylistScreen extends StatefulWidget {
 }
 
 class AddPlaylistScreenState extends State<AddPlaylistScreen> {
+  // Reactive form group for playlist creation.
   final FormGroup frmPlaylist = FormGroup({
     'image': FormControl<String>(validators: []),
     'public': FormControl<bool>(value: false, validators: []),
@@ -21,7 +24,9 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     'genre': FormControl<int>(validators: [Validators.required]),
   });
 
+  // Dropdown items for genre selection.
   List<DropdownMenuItem<int>> genres = [];
+  // Placeholder/default image for new playlists.
   Image playlistImage = Image.asset(
     'assets/images/placeholder.jpg',
     fit: BoxFit.cover,
@@ -33,6 +38,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     _fetchGenres();
   }
 
+  // Fetches genres from the local database and maps them into dropdown menu items.
   Future<void> _fetchGenres() async {
     DBGenreResult result = await DBHelper.dbMusicApp.getAllGenres();
 
@@ -48,6 +54,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     });
   }
 
+  // Updates the displayed playlist image based on the entered image URL.
   void fetchImage() {
     setState(() {
       if (frmPlaylist.control("image").value.toString().isNotEmpty) {
@@ -64,6 +71,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     });
   }
 
+  // Validates and saves the new playlist to the local database.
   Future<void> addPlaylist() async {
     Playlist playlist;
 
@@ -73,6 +81,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
     });
 
     if (frmPlaylist.valid) {
+      // Create a Playlist model from form values
       playlist = Playlist(
         isPublic: frmPlaylist.control('public').value as bool,
         name: frmPlaylist.control('name').value,
@@ -81,10 +90,12 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
         genreId: frmPlaylist.control('genre').value as int,
       );
 
+      // Insert the new playlist into the local DB
       DBPlaylistResult result =
           await DBHelper.dbMusicApp.insertPlaylist(playlist);
 
-      if (mounted) {
+      // Navigate back to playlist list on success
+      if (mounted && result.isSuccess) {
         Navigator.popAndPushNamed(context, "/playlistsPage");
       }
     }
@@ -100,16 +111,19 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
           padding: EdgeInsets.all(16),
           child: Column(
             children: [
+              // Title
               Text(
                 "Create a Playlist",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 20),
+              // Playlist form
               Expanded(
                 child: ReactiveForm(
                   formGroup: frmPlaylist,
                   child: Column(
                     children: [
+                      // Image preview and image URL input
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -122,11 +136,12 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                             ),
                           ),
                           const SizedBox(width: 20),
+                          // Image link and public/private switch
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // const SizedBox(height: 50),
+                                // Input field for image URL
                                 ReactiveTextField(
                                   key: const Key('PlaylistImageLink'),
                                   formControlName: 'image',
@@ -136,6 +151,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                                   onChanged: (context) => fetchImage(),
                                 ),
                                 const SizedBox(height: 20),
+                                // Public/private switch
                                 Text("Public Playlist", style: TextStyle(color: AppColors.textPrimary),),
                                 ReactiveSwitch(
                                   key: const Key('PlaylistIsPublic'),
@@ -151,6 +167,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      // Playlist name input
                       ReactiveTextField(
                         key: const Key('PlaylistName'),
                         formControlName: 'name',
@@ -158,6 +175,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 20),
+                      // Playlist description input
                       ReactiveTextField(
                         key: const Key('PlaylistDescription'),
                         formControlName: 'description',
@@ -166,6 +184,7 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 20),
+                      // Genre dropdown menu
                       ReactiveDropdownField(
                         key: const Key('PlaylistGenreId'),
                         formControlName: 'genre',
@@ -176,11 +195,13 @@ class AddPlaylistScreenState extends State<AddPlaylistScreen> {
                         hint: Text("Select a Genre", style: TextStyle(color: AppColors.textSecondary),),
                       ),
                       const SizedBox(height: 20),
+                      // Save button
                       ElevatedButton(
                           onPressed: addPlaylist,
                           child: Text("Save"),
                       ),
                       const SizedBox(height: 10),
+                      // Cancel button
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
