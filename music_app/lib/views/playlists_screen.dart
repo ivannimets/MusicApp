@@ -16,16 +16,20 @@ class PlaylistsScreen extends StatefulWidget {
 }
 
 class PlaylistsScreenState extends State<PlaylistsScreen> {
+  // List of playlists fetched from the database
   List<Playlist> _playlists = [];
+  // Error or status message
   String _message = "";
+  // Controls whether the loading icon is shown
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchPlaylists();
+    fetchPlaylists(); // Initial fetch of playlists on screen load
   }
 
+  // Fetches all playlists from the local database
   Future<void> fetchPlaylists() async {
     DBPlaylistResult result = await DBHelper.dbMusicApp.getAllPlaylists();
 
@@ -41,6 +45,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     });
   }
 
+  // Shows confirmation dialog before deleting a playlist
   Future<void> confirmDeletePlaylist(int id) async {
     bool? confirm = await showDialog(
       context: context,
@@ -48,10 +53,12 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
         title: Text("Confirm Deletion", style: TextStyle(color: AppColors.textSecondary)),
         content: Text("Are you sure you want to delete this Playlist?", style: TextStyle(color: AppColors.textSecondary)),
         actions: [
+          // Cancel Button
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text("Cancel", style: TextStyle(color: Colors.blueAccent)),
           ),
+          // Confirm Delete
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text("Delete", style: TextStyle(color: Colors.red)),
@@ -65,14 +72,17 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     }
   }
 
+  // Deletes a playlist by ID and refreshes the list
   Future<void> _deletePlaylist(int id) async {
     DBPlaylistResult result = await DBHelper.dbMusicApp.deletePlaylist(id);
 
     if (mounted) {
+      // Show feedback to the user
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(result.message)));
 
+      // Refresh playlists if delete succeeded
       if (result.isSuccess) {
         fetchPlaylists();
       }
@@ -96,6 +106,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header: Title + Add Playlist Button
             Row(
               children: [
                 Expanded(
@@ -119,11 +130,13 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
               ],
             ),
             const SizedBox(height: 5),
+            // Subheading: playlist count
             Text(
-              "${_playlists.length} playlists",
+              "${_playlists.length} playlist${_playlists.length != 1 ? "s" : ""}",
               style: TextStyle(color: AppColors.textPrimary),
             ),
             const SizedBox(height: 5),
+            // Main content area: loading, empty message, or list of playlists
             Expanded(
               child: _isLoading
                   ? Center(child: CircularProgressIndicator())
@@ -138,9 +151,17 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
                           itemCount: _playlists.length,
                           itemBuilder: (context, index) {
                             final Playlist playlist = _playlists[index];
+
+                            // Display each playlist in a card
                             return Card(
                               child: ListTile(
-                                onTap: () => Navigator.pushNamed(context, "/playlistSongs"),
+                                // Tapping opens the playlist detail page
+                                onTap: () => Navigator.pushNamed(
+                                    context,
+                                    "/playlistPage",
+                                  arguments: PlaylistArguments(playlistId: playlist.playlistId!),
+                                ),
+                                // Playlist image (or placeholder)
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: SizedBox(
@@ -160,6 +181,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
                                           ),
                                   ),
                                 ),
+                                // Playlist name and genre
                                 title: Row(
                                   children: [
                                     Text(
@@ -176,19 +198,22 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
                                     ),
                                   ],
                                 ),
+                                // Description and song count
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(playlist.description),
-                                    Text("${playlist.songs!.length} songs"),
+                                    Text("${playlist.songs!.length} song${playlist.songs!.length != 1 ? "s" : ""}"),
                                   ],
                                 ),
+                                // Edit & Delete buttons
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.edit),
+                                      color: Colors.blue,
                                       iconSize: 30,
                                       onPressed: () => Navigator.pushNamed(
                                         context,
@@ -198,7 +223,8 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete_outline),
+                                      icon: Icon(Icons.delete),
+                                      color: Colors.red,
                                       iconSize: 30,
                                       onPressed: () => confirmDeletePlaylist(
                                           playlist.playlistId!),

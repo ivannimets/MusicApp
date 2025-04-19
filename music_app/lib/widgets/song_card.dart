@@ -10,8 +10,12 @@ import '../providers/loginstate_provider.dart';
 class SongCard extends StatefulWidget {
   //Stores the displayed cached song
   final CachedSong song;
+  final VoidCallback? onDelete;
 
-  const SongCard({super.key, required this.song});
+  const SongCard(
+      {super.key,
+      required this.song,
+      this.onDelete});
 
   @override
   SongCardState createState() => SongCardState();
@@ -53,9 +57,9 @@ class SongCardState extends State<SongCard> {
     loginState.user.currentSong = widget.song;
     //Shows a snack bar displaying which song is now playing
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content:
-      Text('Now playing: ${widget.song.name} by ${widget.song.artist}'),
-      backgroundColor: AppColors.primary));
+        content:
+            Text('Now playing: ${widget.song.name} by ${widget.song.artist}'),
+        backgroundColor: AppColors.primary));
     //Navigates the user back to the playing page
     Navigator.popAndPushNamed(context, "/playingPage");
   }
@@ -119,12 +123,34 @@ class SongCardState extends State<SongCard> {
             ),
           ],
         ),
-        //Creates the play icon button on the song
-        trailing: Icon(
-          Icons.play_arrow,
-          color: Colors.green,
-          size: 30,
-        ),
+        //Creates the play icon button on the song, including delete button if required
+        trailing: widget.onDelete == null
+            ? Icon(
+                Icons.play_arrow,
+                color: Colors.green,
+                size: 30,
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.play_arrow,
+                    color: Colors.green,
+                    size: 30,
+                  ),
+                  SizedBox(width: 15),
+                  IconButton(
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                      size: 30,
+                    ),
+                    // widget onDelete properties triggers associated callback on parent screen
+                    onPressed: widget.onDelete,
+                  ),
+                ],
+              ),
         //Handles the user tap to change the song
         onTap: () => changeSong(context),
       ),

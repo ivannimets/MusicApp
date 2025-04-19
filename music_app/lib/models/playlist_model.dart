@@ -6,10 +6,11 @@ class Playlist {
   String? imageLink;
   List<Song>? songs;
   late int genreId;
-  late Genre? genre;
+  Genre? genre;
 
   Playlist({this.playlistId, required this.isPublic, required this.name, required this.description, this.imageLink, this.songs, required this.genreId, this.genre});
 
+  // Facilitates conversion between database result and class definition
   Playlist.fromMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
       throw Exception("You must provide a map with data");
@@ -23,6 +24,7 @@ class Playlist {
     genreId = map['genreId'] ?? -1;
   }
 
+  // Facilitates conversion between class definition and database result
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'isPublic': isPublic,
@@ -39,6 +41,7 @@ class Genre {
   late int genreId;
   late String name;
 
+  // Facilitates conversion between database result and class definition
   Genre.fromMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
       throw Exception("You must provide a map with data");
@@ -47,6 +50,7 @@ class Genre {
     name = map['name'];
   }
 
+  // Facilitates conversion between class definition and database result
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'genreId': genreId,
@@ -61,6 +65,7 @@ class Song {
 
   Song({required this.songLink});
 
+  // Facilitates conversion between database result and class definition
   Song.fromMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
       throw Exception("You must provide a map with data");
@@ -68,6 +73,7 @@ class Song {
     songLink = map['songLink'];
   }
 
+  // Facilitates conversion between class definition and database result
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'songLink': songLink
